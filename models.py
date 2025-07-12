@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, JSON, ForeignKey
 from sqlalchemy.orm import declarative_base
 from pydantic import BaseModel, validator
-from typing import Optional, List
+from typing import Any, Dict, Optional, List
 
 Base = declarative_base()
 
@@ -12,7 +12,7 @@ class Hotel(Base):
     destination_id = Column(Integer)
     name = Column(String)
     description = Column(String)
-    image = Column(String)
+    images = Column(JSON)
     location = Column(JSON)
     amenities = Column(JSON)
     booking_conditions = Column(JSON)
@@ -56,3 +56,21 @@ class LocationSerializer(BaseModel):
 class AmenitiesSerializer(BaseModel):
     general: List = []
     room: List = []
+
+    @validator("general", "room", pre=True)
+    def lower_case_amenities(cls, v):
+        return [i.lower() for i in v]
+
+
+class HotelSerializer(BaseModel):
+    id: str
+    destination_id: int
+    name: str
+    description: str
+    images: dict
+    location: dict
+    amenities: dict
+    booking_conditions: Optional[List]
+
+    class Config:
+        orm_mode = True

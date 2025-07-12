@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS hotels (
     description TEXT,
     images JSON,
     location JSON,
-    attributes JSON,
+    amenities JSON,
+    booking_conditions JSON,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
