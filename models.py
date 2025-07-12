@@ -22,7 +22,7 @@ class HotelAttribute(Base):
     __tablename__ = 'hotel_attributes'
 
     id = Column(Integer, primary_key=True)
-    hotel_id = Column(String, ForeignKey('hotels.id'))
+    hotel_id = Column(String)
     source = Column(String)
     attributes = Column(JSON)
 
@@ -73,4 +73,4 @@ class HotelSerializer(BaseModel):
     booking_conditions: Optional[List]
 
     class Config:
-        orm_mode = True
+        from_attributes = True

@@ -1,47 +1,42 @@
-import sqlite3
-from config import DB_PATH
+import asyncio
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import create_async_engine
+from config import DATABASE_URL
+from models import Base
 
-SCHEMA_SQL = """
-CREATE TABLE IF NOT EXISTS hotels (
-    id TEXT PRIMARY KEY,
-    destination_id INTEGER,
-    name TEXT,
-    description TEXT,
-    images JSON,
-    location JSON,
-    amenities JSON,
-    booking_conditions JSON,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+# Define indexes separately
+INDEXES = [
+    "CREATE INDEX IF NOT EXISTS idx_hotels_id ON hotels(id)",
+    "CREATE INDEX IF NOT EXISTS idx_hotels_destination_id ON hotels(destination_id)",
+    "CREATE INDEX IF NOT EXISTS idx_hotel_attributes_hotel_id ON hotel_attributes(hotel_id)",
+    "CREATE INDEX IF NOT EXISTS idx_hotel_attributes_source ON hotel_attributes(source)"
+]
 
-CREATE TABLE IF NOT EXISTS hotel_attributes (
-    id INTEGER PRIMARY KEY,
-    hotel_id TEXT NOT NULL,
-    source TEXT,
-    attributes JSON,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (hotel_id) REFERENCES hotels(id)
-);
+async def create_database():
+    """Create database schema using SQLAlchemy models"""
+    try:
+        # Create async engine
+        engine = create_async_engine(DATABASE_URL, echo=True)
 
--- Indexes for performance
-CREATE INDEX IF NOT EXISTS idx_hotels_id ON hotels(id);
-CREATE INDEX IF NOT EXISTS idx_hotels_destination_id ON hotels(destination_id);
-"""
+        # Create all tables from models
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.drop_all)  # Drop existing tables
+            await conn.run_sync(Base.metadata.create_all)  # Create tables
 
-def create_database(db_path: str, schema: str):
-    # Connect to the SQLite database (creates file if it doesn't exist)
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
+            # Create indexes one by one
+            for index_sql in INDEXES:
+                await conn.execute(text(index_sql))
 
-    # Execute the schema
-    cursor.executescript(schema)
+            await conn.commit()
 
-    # Commit and close
-    conn.commit()
-    conn.close()
-    print(f"Database schema created at: {db_path}")
+        print("Database schema created successfully!")
+
+        # Close engine
+        await engine.dispose()
+
+    except Exception as e:
+        print(f"Error creating database schema: {str(e)}")
+        raise
 
 if __name__ == "__main__":
-    create_database(DB_PATH, SCHEMA_SQL)
+    asyncio.run(create_database())

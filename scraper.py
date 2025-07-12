@@ -8,11 +8,12 @@ from sqlalchemy import select
 
 from config import *
 from models import *
+from api import engine, AsyncSessionLocal
 
 
 class Scraper:
     def __init__(self):
-        self.engine = create_async_engine(DATABASE_URL, echo=True)
+        self.engine = engine
         self.session_factory = sessionmaker(
             bind=self.engine,
             class_=AsyncSession,
@@ -75,7 +76,7 @@ class Scraper:
                 })
             )
             mapped_attributes.append(hotel_attributes)
-        async with self.session_factory() as session:
+        async with AsyncSessionLocal() as session:
             session.add_all(mapped_attributes)
             await session.commit()
 
@@ -135,7 +136,7 @@ class Scraper:
                 })
             )
             mapped_attributes.append(hotel_attributes)
-        async with self.session_factory() as session:
+        async with AsyncSessionLocal() as session:
             session.add_all(mapped_attributes)
             await session.commit()
 
@@ -202,13 +203,13 @@ class Scraper:
                 })
             )
             mapped_attributes.append(hotel_attributes)
-        async with self.session_factory() as session:
+        async with AsyncSessionLocal() as session:
             session.add_all(mapped_attributes)
             await session.commit()
 
     async def mapper(self):
         ids = []
-        async with self.session_factory() as session:
+        async with AsyncSessionLocal() as session:
             ids_query = select(HotelAttribute.hotel_id).distinct()
             result = await session.execute(ids_query)
             ids = result.scalars().all()
