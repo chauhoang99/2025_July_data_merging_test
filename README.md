@@ -65,6 +65,13 @@
 Database Schema
 ===============
 
+<details> <summary><strong>Click to expand fixed schema diagram</strong></summary>
+markdown
+Copy
+Edit
+Database Schema
+===============
+
 +------------------------------+
 |           hotels             |
 +------------------------------+
@@ -89,7 +96,7 @@ Database Schema
 | source            |  | hotel_id (FK to hotels) |
 | attributes (jsonb)|  +-------------------------+
 +-------------------+
-
+</details>
 - Query activities mainly happen on the table `hotels` and the table `images`.
 
 - **Performance decision:**
