@@ -69,7 +69,7 @@
 | destination_id               |
 | name                         |
 | description                  |
-| image                        |
+| images (jsonb)               |
 | location (jsonb)             |
 | attributes (jsonb)           |
 +------------------------------+
@@ -87,12 +87,12 @@
 | attributes (jsonb)|  +-------------------------+
 +-------------------+
 ```
-- Query activities mainly happen on the table `hotels` and the table `images`.
+- Query activities mainly happen on the table `hotels`.
 
 - **Performance decision:**
   - Table indexing: `hotels.id`, `hotels.destination_id`.
   - All attributes from the sources can be stored in a `jsonb` field.  
-    **Reason:** We are not querying by attributes in this exercise. In real life, if we query on attributes often, we can create columns for them to utilise indexing. Same reasoning applies for the `location` field.
+    **Reason:** We are not querying by attributes in this exercise. In real life, if we query on attributes often, we can create columns for them to utilise indexing. Same reasoning applies for the `location` field and the `images` field.
 
 # The Scrapers
 
