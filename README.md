@@ -3,6 +3,10 @@
 - The sources:
   - Since this is a simplified version, I assume that the data returned by suppliers is completed, there is no pagination and there will be no subsequent batch of data after this batch.
 
+# Data clustering
+
+- In this assignment I am allowed to merge data by hotel_id and destination_id
+
 # Data Selection
 
 - Content quality control is a huge process involving multiple teams with different domain knowledges. I only can oversimplified it into this set of rules, each rule has its own amount of quality points and criteria. The higher the points the more dependent to the source, like, I'm not going to rewrite the descriptions so I rely on the descriptions come from the source. The lower the points, the easier for me to implement a data fix. If a source can pass 50% of the criteria, it pass the rule and receive the points:
@@ -91,7 +95,7 @@
 - **Performance decision:**
   - Table indexing: `hotels.id`, `hotels.destination_id`.
   - All attributes from the sources can be stored in a `jsonb` field.  
-    **Reason:** We are not querying by attributes in this exercise. In real life, if we query on attributes often, we can create columns for them to utilise indexing. Same reasoning applies for the `location` field.
+    **Reason:** We are not querying by attributes in this assignment. In real life, if we query on attributes often, we can create columns for them to utilise indexing. Same reasoning applies for the `location` field.
 
 # The Scrapers
 
@@ -99,7 +103,7 @@
 - One sensoring method to detect new data from the sources. If there is new data, the sensoring method will call the relevant scraper methods to procure data.
 - Data cleaning will happen in each scraper; each scraper has its own attribute mapping.
 - Each scraper will save its processed data to the `hotel_attributes` table. This is for data quality control later. If needed, I also can do data backfilling by using data in this table.
-- At the end of this flow, there is one mapping method that will combine all the cleaned data from the scrapers, do attribute value selection based on source ranking, then save the final data to the database.
+- At the end of this flow, there is one mapping method that will combine all the cleaned data from the scrapers, do attribute value selection based on source ranking, then save the final data to the database. Every time there is a new batch of data coming in, this mapping method will check and update the hotels table with attributes, images and location from the highest ranking source available at that time.
 
 - **Performance decision:**
   - The sensor is a lightweight task that will run first to check if there is data to process before spinning up the scrapers. We save resources by using this method.
