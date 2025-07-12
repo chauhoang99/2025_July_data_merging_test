@@ -7,6 +7,11 @@
 
 - In this assignment I am allowed to merge data by hotel_id and destination_id
 
+# Data cleaning
+
+- String sanitization.
+- Using Pydantic serializers to validate and transform field data.
+
 # Data Selection
 
 - Content quality control is a huge process involving multiple teams with different domain knowledges. I only can oversimplified it into this set of rules, each rule has its own amount of quality points and criteria. The higher the points the more dependent to the source, like, I'm not going to rewrite the descriptions so I rely on the descriptions come from the source. The lower the points, the easier for me to implement a data fix. If a source can pass 50% of the criteria, it pass the rule and receive the points:
@@ -33,7 +38,7 @@
       - Has short, too summarised description.
     - 0 points for the second rule:
       - Does not have images and booking_conditions
-      - Has null lat and lng in 2 over 3 results.
+      - Has null and empty lat and lng in 2 over 3 results.
     - 0 points for the third rule:
       - String has extra spacing.
     - **Total: 0 points**
@@ -55,7 +60,7 @@
       - Has image links in both entries.
       - Has informative descriptions for all entries (long, detailed details fields).
     - 2 points for the second rule:
-      - Entries have many attributes including nested objects like location, amenities, images, booking_conditions (complete).
+      - Entries have many attributes including nested objects like location, amenities, images, booking_conditions.
       - Very few null or empty attributes; most fields are filled across all entries. Extra: there is one hotel that are not returned by the other 2 sources.
     - 1 point for the third rule:
       - Numbers are correctly formatted where applicable.
@@ -65,37 +70,42 @@
 - For each attribute, the one from the highest quality source will be selected, in case it is null or empty, the non empty one from the next in rank source will be selected.
 
 # Database schema:
-
-                                +------------------------------+
-                                |           hotels             |
-                                +------------------------------+
-                                | id (PK)                      |
-                                | destination_id               |
-                                | name                         |
-                                | description                  |
-                                | image                        |
-                                | location (jsonb)             |
-                                | attributes (jsonb)           |
-                                +------------------------------+
-                                     ▲           ▲
-                                     │           │
-           +-------------------------+           +-----------------------+
-           |                                                             |
-+-------------------------------+                  +-------------------------+
-|      hotel_attributes         |                  |         images          |
-+-------------------------------+                  +-------------------------+
-| id (PK)                       |                  | id (PK)                 |
-| hotel_id (FK to hotels)       |                  | source                  |
-| source                        |                  | hotel_id (FK to hotels) |
-| attributes (jsonb)            |                  +-------------------------+
-+-------------------------------+
-
-- Query activities mainly happen on the table `hotels` and the table `images`.
+```
++------------------------------+
+|           hotels             |
++------------------------------+
+| id (PK)                      |
+| destination_id               |
+| name                         |
+| description                  |
+| images (json)                |
+| location (json)              |
+| amenities (json)             |
+| booking_conditions (json)    |
+| created_at                   |
+| updated_at                   |
++------------------------------+
+         ▲
+         │
+         │
++-------------------+
+| hotel_attributes  |
++-------------------+
+| id (PK)           |
+| hotel_id (FK)     |
+| source            |
+| attributes (json) |
+| attributes (json) |
+| created_at        |
+| updated_at        |
++-------------------+
+```
+- Query activities mainly happen on the table `hotels`.
 
 - **Performance decision:**
   - Table indexing: `hotels.id`, `hotels.destination_id`.
-  - All attributes from the sources can be stored in a `jsonb` field.  
-    **Reason:** We are not querying by attributes in this assignment. In real life, if we query on attributes often, we can create columns for them to utilise indexing. Same reasoning applies for the `location` field.
+  - All attributes from the sources can be stored in a `json` field.  
+    **Reason:** We are not querying by `images`, `location`, `amenities` and `booking_conditions` in this exercise but we need to fetch them very often. By adding them in the table `hotels`, we can avoid writing join queries or subqueries, produce better execution plan for better query performance. In real life, if we need to run query on nested values of those attributes often, we can create columns for them to utilise indexing.
 
 # The Scrapers
 
@@ -103,7 +113,8 @@
 - One sensoring method to detect new data from the sources. If there is new data, the sensoring method will call the relevant scraper methods to procure data.
 - Data cleaning will happen in each scraper; each scraper has its own attribute mapping.
 - Each scraper will save its processed data to the `hotel_attributes` table. This is for data quality control later. If needed, I also can do data backfilling by using data in this table.
-- At the end of this flow, there is one mapping method that will combine all the cleaned data from the scrapers, do attribute value selection based on source ranking, then save the final data to the database. Every time there is a new batch of data coming in, this mapping method will check and update the hotels table with attributes, images and location from the highest ranking source available at that time.
+- About images, so far I don't see a need to treat them separately since we don't include image ranking or image processing in this assignment. The most simplest way to manage them is to keep them in `hotel_attributes`.
+- At the end of this workflow, there will be one mapping method that will combine all the cleaned data from the scrapers, do attribute value selection based on source ranking, then save the selected attributes to the right hotel.id in the `hotels` table. Every time there is a new batch of data coming in, this mapping method will check and update the hotels table with attributes, images and location from the highest ranking source available at that time.
 
 - **Performance decision:**
   - The sensor is a lightweight task that will run first to check if there is data to process before spinning up the scrapers. We save resources by using this method.
