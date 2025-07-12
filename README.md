@@ -99,7 +99,7 @@
 - The Scraper is a Python class that mimics the DAG architecture of Apache Airflow in a very simple way.
 - One sensoring method to detect new data from the sources. If there is new data, the sensoring method will call the relevant scraper methods to procure data.
 - Data cleaning will happen in each scraper; each scraper has its own attribute mapping.
-- Each scraper will save its processed data to the `hotel_attributes` table. This is for data quality control later. If needed, I also can do data backfilling by using data in this table.
+- Each scraper will save its processed data to the `hotel_attributes` table, and extracted images to the `images` table. This is for data quality control later. If needed, I also can do data backfilling by using data in this table.
 - At the end of this flow, there is one mapping method that will combine all the cleaned data from the scrapers, do attribute value selection based on source ranking, then save the final data to the database.
 
 - **Performance decision:**
