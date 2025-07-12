@@ -95,7 +95,6 @@
 | hotel_id (FK)     |
 | source            |
 | attributes (json) |
-| attributes (json) |
 | created_at        |
 | updated_at        |
 +-------------------+
