@@ -61,11 +61,7 @@
 - For each attribute, the one from the highest quality source will be selected, in case it is null or empty, the non empty one from the next in rank source will be selected.
 
 # Database schema:
-
-Database Schema
-===============
-
-(Better to view in raw mode)
+```
 +------------------------------+
 |           hotels             |
 +------------------------------+
@@ -90,7 +86,7 @@ Database Schema
 | source            |  | hotel_id (FK to hotels) |
 | attributes (jsonb)|  +-------------------------+
 +-------------------+
-
+```
 - Query activities mainly happen on the table `hotels` and the table `images`.
 
 - **Performance decision:**
