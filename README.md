@@ -62,29 +62,33 @@
 
 # Database schema:
 
-                                +------------------------------+
-                                |           hotels             |
-                                +------------------------------+
-                                | id (PK)                      |
-                                | destination_id               |
-                                | name                         |
-                                | description                  |
-                                | image                        |
-                                | location (jsonb)             |
-                                | attributes (jsonb)           |
-                                +------------------------------+
-                                     ▲           ▲
-                                     │           │
-           +-------------------------+           +-----------------------+
-           |                                                             |
-+-------------------------------+                  +-------------------------+
-|      hotel_attributes         |                  |         images          |
-+-------------------------------+                  +-------------------------+
-| id (PK)                       |                  | id (PK)                 |
-| hotel_id (FK to hotels)       |                  | source                  |
-| source                        |                  | hotel_id (FK to hotels) |
-| attributes (jsonb)            |                  +-------------------------+
-+-------------------------------+
+Database Schema
+===============
+
++------------------------------+
+|           hotels             |
++------------------------------+
+| id (PK)                      |
+| destination_id               |
+| name                         |
+| description                  |
+| image                        |
+| location (jsonb)             |
+| attributes (jsonb)           |
++------------------------------+
+         ▲             ▲
+         │             │
+         │             │
+         │             │
+         │             │
++-------------------+  +-------------------------+
+| hotel_attributes  |  |        images           |
++-------------------+  +-------------------------+
+| id (PK)           |  | id (PK)                 |
+| hotel_id (FK)     |  | source                  |
+| source            |  | hotel_id (FK to hotels) |
+| attributes (jsonb)|  +-------------------------+
++-------------------+
 
 - Query activities mainly happen on the table `hotels` and the table `images`.
 
