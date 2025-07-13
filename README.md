@@ -2,7 +2,7 @@
 
 - Make sure your Docker Desktop is up and running.
 - Clone this repo to your local
-- On your CMD go to the main repo where the docker-compose.yaml file is stored.
+- On your CMD go to the main repo where the docker-compose.yaml file is stored. Which should be the `2025_July_data_merging_test` folder.
 - Run `docker compose up -d`
 - Wait until all containers start.
 - Call GET http://localhost:8000/hotels to see the outcome.
