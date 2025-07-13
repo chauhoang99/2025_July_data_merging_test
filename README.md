@@ -184,3 +184,4 @@
 # What can be better
 
 - Increase data quality control by implementing source priority for each attribute. For example we can say descriptions from patagonia are always better than the others so we will proritise descriptions from patagonia.
+- In Airflow environment, the scrapers can pass the hotel ids to the mapper so the mapper does not need to get hotel ids from the database, saving one more API call.
