@@ -57,7 +57,9 @@ services:
     command: ["scraper"]
     depends_on:
       - app
-    restart: on-failure
+    deploy:
+      restart_policy:
+        condition: none
 
 volumes:
   postgres_data: 
