@@ -2,6 +2,7 @@ import httpx
 import asyncio
 import html
 import json
+import re
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import select
@@ -214,7 +215,6 @@ class Scraper:
             result = await session.execute(ids_query)
             ids = result.scalars().all()
             hotels = []
-
             for id in ids:
                 query = select(HotelAttribute).where(HotelAttribute.hotel_id == id)
                 result = await session.execute(query)
@@ -290,8 +290,9 @@ class Scraper:
              return res.json()
 
     def sanitize_string(self, s: str) -> str:
-        s = html.escape(s.strip())  # trim and escape HTML
-        s = html.unescape(s)
+        s = html.unescape(s.strip())  # First unescape any HTML entities
+        s = re.sub(r'<script\b[^>]*>.*?</script>', '', s, flags=re.IGNORECASE | re.DOTALL)  # Remove script tags and their content
+        s = re.sub(r'<[^>]+>', '', s)  # Remove other HTML tags
         return s
 
     def sanitize_data(self, data):
