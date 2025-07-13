@@ -14,7 +14,7 @@
 - The sources:
   - Since this is a simplified version, I assume that the data returned by suppliers is completed, there is no pagination and there will be no subsequent batch of data after this batch.
 
-# Data clustering
+# Data merging
 
 - In this assignment I am allowed to merge data by hotel_id and destination_id
 
