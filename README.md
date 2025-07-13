@@ -175,6 +175,8 @@
 - The API acceptps 2 parameters:
   - hotels: an array of strings, which are the hotel ids
   - destination: number, destination id
+- **Performance decision:**
+  - Paginate the API when data is bigger to set a limit for the index query.
 
 # Testing plan
 
