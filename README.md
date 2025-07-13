@@ -35,15 +35,15 @@
 
 - Content quality control is a huge process involving multiple teams with different domain knowledges. I only can oversimplified it into this set of rules, each rule has its own amount of quality points and criteria. The higher the points the more dependent to the source, like, I'm not going to rewrite the descriptions so I rely on the descriptions come from the source. The lower the points, the easier for me to implement a data fix. If a source can pass 50% of the criteria, it pass the rule and receive the points:
 
-  - **The most attractive the better: 3 points**
+  - **The more attractive the better: 3 points**
     - Has image links.
     - Has informative descriptions.
 
-  - **The most complete the better: 2 points**
+  - **The more complete the better: 2 points**
     - Has the most attributes that can be mapped to the final API response.
     - Has the least null or empty attributes.
 
-  - **The closest to clean data the better: 1 point**
+  - **The cleaner data the better: 1 point**
     - Numbers in number format
     - String in good string format:
       - No extra spacing.
