@@ -138,6 +138,31 @@
 - About images, so far I don't see a need to treat them separately since we don't include image ranking or image processing in this assignment. The most simplest way to manage them is to keep them in `hotel_attributes`.
 - At the end of this workflow, there will be one mapping method that will combine all the cleaned data from the scrapers, do attribute value selection based on source ranking, then save the selected attributes to the right hotel.id in the `hotels` table. Every time there is a new batch of data coming in, this mapping method will check and update the hotels table with attributes, images and location from the highest ranking source available at that time.
 
+  ```
+                    +----------------------+
+                    |  api_data_sensor     |
+                    +----------+-----------+
+                               |
+                               v
+              +-----------------------------+
+              |  trigger_scraper_decision   |
+              +-----------------------------+
+                               |
+                               v
+          +----------+    +-----------+    +-----------+
+          | scraper1 |    | scraper2  |    | scraper3  |
+          +----+-----+    +-----+-----+    +-----+-----+
+               \              |                /
+                \             |               /
+                 \            |              /
+                  \           |             /
+                   v          v            v
+                        +----------------+
+                        |    mapper      |
+                        +----------------+
+
+```
+
 - **Performance decision:**
   - The sensor is a lightweight task that will run first to check if there is data to process before spinning up the scrapers. We save resources by using this method.
   - Async scrapers to speed up scraping activity.
