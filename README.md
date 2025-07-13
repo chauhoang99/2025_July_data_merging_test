@@ -1,3 +1,10 @@
+# How to run
+
+- Make sure your Docker Desktop is up and running.
+- Clone this repo to your local
+- On your CMD go to the main repo where the docker-compose.yaml file is stored.
+- Run `docker compose up -d`
+
 # Assumption
 
 - The sources:
