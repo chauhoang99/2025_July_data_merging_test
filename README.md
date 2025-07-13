@@ -5,7 +5,7 @@
 - On your CMD go to the main repo where the docker-compose.yaml file is stored.
 - Run `docker compose up -d`
 
-# Why Docker?
+# Why Docker
 
 - Docker is chosen as a deployment solution for this assignment to make sure all the environment variables are static across all operation system. The assignment can work on any computer as long as there is Docker installed on that computer.
   
