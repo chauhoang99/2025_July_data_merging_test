@@ -180,3 +180,7 @@
 - Unit tests that cover over 80% of the code.
 - Manually test the scraper.
 - Manually test the API call.
+
+# What can be better
+
+- Increase data quality control by implementing source priority for each attribute. For example we can say descriptions from patagonia are always better than the others so we will proritise descriptions from patagonia.
