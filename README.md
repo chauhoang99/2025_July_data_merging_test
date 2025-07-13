@@ -9,7 +9,7 @@
 
 # Why Docker
 
-- Docker is chosen as a deployment solution for this assignment to make sure all the environment variables are static across all operation system. The assignment can work on any computer as long as there is Docker installed on that computer.
+- Docker is chosen as a deployment solution for this assignment to make sure all the environment variables and dependencies are static across all operation systems. It is to guarantee that the assignment can work on any computer as long as there is Docker installed on that computer.
 
 # What do we have insider Docker
 
