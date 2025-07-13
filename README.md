@@ -162,8 +162,6 @@
                              +----------------+
 
 
-```
-
 - **Performance decision:**
   - The sensor is a lightweight task that will run first to check if there is data to process before spinning up the scrapers. We save resources by using this method.
   - Async scrapers to speed up scraping activity.
