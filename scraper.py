@@ -39,12 +39,14 @@ class Scraper:
     async def acme_scraper(self):
         data = await self.async_request('GET', self.sources['acme'])
         mapped_attributes = []
+        hotel_ids = []
         for record in data:
             # Simple data cleaning
             record = self.sanitize_data(record) 
 
             # Data attribute mapping
             id = record['Id']
+            hotel_ids.append(id)
             destination_id = record['DestinationId']
             name = record['Name']
             description = record['Description']
@@ -80,14 +82,17 @@ class Scraper:
         async with AsyncSessionLocal() as session:
             session.add_all(mapped_attributes)
             await session.commit()
+        return hotel_ids
 
     async def patagonia_scraper(self):
         data = await self.async_request('GET', self.sources['patagonia'])
         mapped_attributes = []
+        hotel_ids = []
         for record in data:
             record = self.sanitize_data(record) # Simple data cleaning
             # Data attribute mapping
             id = record['id']
+            hotel_ids.append(id)
             destination_id = record['destination']
             name = record['name']
             description = record['info']
@@ -140,14 +145,17 @@ class Scraper:
         async with AsyncSessionLocal() as session:
             session.add_all(mapped_attributes)
             await session.commit()
+        return hotel_ids
 
     async def paperflies_scraper(self):
         data = await self.async_request('GET', self.sources['paperflies'])
         mapped_attributes = []
+        hotel_ids = []
         for record in data:
             record = self.sanitize_data(record) # Simple data cleaning
             # Data attribute mapping
             id = record['hotel_id']
+            hotel_ids.append(id)
             destination_id = record['destination_id']
             name = record['hotel_name']
             description = record['details']
@@ -207,15 +215,12 @@ class Scraper:
         async with AsyncSessionLocal() as session:
             session.add_all(mapped_attributes)
             await session.commit()
+        return hotel_ids
 
-    async def mapper(self):
-        ids = []
+    async def data_merging(self, hotel_ids):
         async with AsyncSessionLocal() as session:
-            ids_query = select(HotelAttribute.hotel_id).distinct()
-            result = await session.execute(ids_query)
-            ids = result.scalars().all()
             hotels = []
-            for id in ids:
+            for id in hotel_ids:
                 query = select(HotelAttribute).where(HotelAttribute.hotel_id == id)
                 result = await session.execute(query)
                 attributes = result.scalars().all()
@@ -271,6 +276,7 @@ class Scraper:
         sources = []
         queries = []
         scrapers = []
+        all_hotel_ids = set()
         for source in self.sources:
             sources.append(source)
             queries.append(self.async_request('GET', self.sources[source]))
@@ -278,10 +284,14 @@ class Scraper:
         for i in range(len(sources)):
             if len(results[i]):
                 scrapers.append(self.scrapers[sources[i]]())
-        await asyncio.gather(*scrapers)
+        scraper_results = await asyncio.gather(*scrapers)
 
-        # Mapping all clustered data
-        await self.mapper()
+        # Collect all unique hotel IDs from scrapers
+        for hotel_ids in scraper_results:
+            all_hotel_ids.update(hotel_ids)
+
+        # Mapping all clustered data with collected IDs
+        await self.data_merging(list(all_hotel_ids))
 
     async def async_request(self, method: str, url: str) -> httpx.Response:
         async with httpx.AsyncClient() as client:

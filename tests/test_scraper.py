@@ -153,13 +153,16 @@ async def test_paperflies_scraper(test_session, mock_scraper):
 @pytest.mark.asyncio
 async def test_mapper_with_multiple_sources(test_session, mock_scraper):
     """Test mapping data from multiple sources"""
-    # Scrape data from all sources
-    await mock_scraper.acme_scraper()
-    await mock_scraper.patagonia_scraper()
-    await mock_scraper.paperflies_scraper()
+    # Scrape data from all sources and collect hotel IDs
+    acme_ids = await mock_scraper.acme_scraper()
+    patagonia_ids = await mock_scraper.patagonia_scraper()
+    paperflies_ids = await mock_scraper.paperflies_scraper()
+
+    # Combine all hotel IDs
+    all_hotel_ids = list(set(acme_ids + patagonia_ids + paperflies_ids))
     
-    # Run the mapper
-    await mock_scraper.mapper()
+    # Run the mapper with collected IDs
+    await mock_scraper.data_merging(all_hotel_ids)
     
     # Verify the mapped data
     result = await test_session.execute(select(Hotel))
