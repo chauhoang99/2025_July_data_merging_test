@@ -33,7 +33,7 @@
 
 # Data Selection
 
-- Content quality control is a huge process involving multiple teams with different domain knowledges. I only can oversimplified it into this set of rules, each rule has its own amount of quality points and criteria. The higher the points the more dependent to the source, like, I'm not going to rewrite the descriptions so I rely on the descriptions come from the source. The lower the points, the easier for me to implement a data fix. If a source can pass 50% of the criteria, it pass the rule and receive the points:
+- Content quality control is a huge process involving multiple teams with different domain knowledges. I only can oversimplified it into this set of rules, each rule has its own amount of quality points and criteria. The higher the points the more dependent I am to the source, like, I'm not going to rewrite the descriptions so I rely on the descriptions come from the source, then I prefer sources that provide good descriptions. The lower the points, the easier for me to implement a data fix. If a source can pass 50% of the criteria, it pass the rule and receive the points:
 
   - **The more attractive the better: 3 points**
     - Has image links.
@@ -127,7 +127,7 @@
 - **Performance decision:**
   - Table indexing: `hotels.id`, `hotels.destination_id`.
   - All attributes from the sources can be stored in a `json` field.  
-    **Reason:** We are not querying by `images`, `location`, `amenities` and `booking_conditions` in this exercise but we need to fetch them very often. By adding them in the table `hotels`, we can avoid writing join queries or subqueries, produce better execution plan for better query performance. In real life, if we need to run query on nested values of those attributes often, we can create columns for them to utilise indexing.
+    **Reason:** We are not querying by `images`, `location`, `amenities` and `booking_conditions` in this exercise so there is lesser need to store them in column and row data structure because the need for storing them in columns is mainly to utilise indexing. But we need to fetch them very often, by adding them in the table `hotels`, we can avoid writing join queries or subqueries, produce better execution plan for better query performance. In real life, if a need to run query on nested values of those attributes arises, we can always create columns for them and migrate data to new columns easily.
 
 # The Scrapers
 
@@ -136,7 +136,7 @@
 - Data cleaning will happen in each scraper; each scraper has its own attribute mapping.
 - Each scraper will save its processed data to the `hotel_attributes` table. This is for data quality control later. If needed, I also can do data backfilling by using data in this table.
 - About images, so far I don't see a need to treat them separately since we don't include image ranking or image processing in this assignment. The most simplest way to manage them is to keep them in `hotel_attributes`.
-- At the end of this workflow, there will be one mapping method that will combine all the cleaned data from the scrapers, do attribute value selection based on source ranking, then save the selected attributes to the right hotel.id in the `hotels` table. Every time there is a new batch of data coming in, this mapping method will check and update the hotels table with attributes, images and location from the highest ranking source available at that time.
+- At the end of this workflow, there will be one data merging method that will combine all the cleaned data from the scrapers, do attribute value selection based on source ranking, then save the selected attributes to the right hotel.id in the `hotels` table. Every time there is a new batch of data coming in, this method will check and update the hotels table with the best attributes it can find at that time.
 
   ```
                         +----------------------+
@@ -157,9 +157,9 @@
                    \                   |                       /
                     \                  |                      /
                      v                 v                     v
-                             +----------------+
-                             |     mapper     |
-                             +----------------+
+                             +----------------------+
+                             |     data_merging     |
+                             +----------------------+
 
 
 - **Performance decision:**
@@ -167,6 +167,7 @@
   - Async scrapers to speed up scraping activity.
   - Each scraper is scalable depending on the amount of data.
   - Data can be processed in chuncks, but usually for data comes from APIs, we can request API with pagination so chunking is not always necessary.
+  - In case the scrapers scrape a large number of hotel ids(not in this assignment), hotel ids from the scrapers can be put in a message queue (Kafka, GCP PubSub, Redis, etc..) and the data_merging can consume the message queue for hotel ids. Then we also can scale up the data_merging to clear messages in queue faster.
 
 # The API Server
 
@@ -177,11 +178,17 @@
 
 # Testing plan
 
-- Unit tests that cover over 80% of the code.
+- Unit tests that cover over 80% of the code. To run unit tests, run the command `pytest`
 - Manually test the scraper.
-- Manually test the API call.
+- Manually test the API call:
+  - GET \hotels
+  - GET \hotels?hotels=iJhz,SjyX
+  - GET \hotels?hotels=iJhz&hotels=SjyX
+  - GET \hotels?destination=123
+  - GET \hotels?destination=123&hotels=SjyX
 
 # What can be better
 
 - Increase data quality control by implementing source priority for each attribute. For example we can say descriptions from patagonia are always better than the others so we will proritise descriptions from patagonia.
-- In Airflow environment, the scrapers can pass the hotel ids to the mapper so the mapper does not need to get hotel ids from the database, saving one more API call.
+
+# Thank you for your time and consideration!
