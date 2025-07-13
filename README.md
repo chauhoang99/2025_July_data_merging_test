@@ -146,7 +146,10 @@
 
 # The API Server
 
-- One simple FastAPI server with one API only.
+- One simple FastAPI server with one only API: /hotels
+- The API acceptps 2 parameters:
+  - hotels: an array of strings, which are the hotel ids
+  - destination: number, destination id
 
 # Testing plan
 
