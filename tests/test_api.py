@@ -49,11 +49,18 @@ async def test_get_hotels_by_id(test_client, test_session, sample_hotel_data):
     response = test_client.get("/hotels?hotels=test_hotel_1,test_hotel_2")
     assert response.status_code == status.HTTP_200_OK
     hotels = response.json()
-    print(hotels)
+
     assert len(hotels) == 2
     hotel_ids = [h["id"] for h in hotels]
     assert "test_hotel_1" in hotel_ids
     assert "test_hotel_2" in hotel_ids
+
+    # Test filtering by hotel IDs
+    response = test_client.get("/hotels?hotels=test_hotel_1&hotels=test_hotel_2")
+    assert response.status_code == status.HTTP_200_OK
+    hotels = response.json()
+    assert len(hotels) == 2
+
 
 @pytest.mark.asyncio
 async def test_get_hotels_by_destination(test_client, test_session, sample_hotel_data):
