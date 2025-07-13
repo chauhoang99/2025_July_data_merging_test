@@ -35,7 +35,6 @@ services:
       - POOL_SIZE=20
       - MAX_OVERFLOW=30
       - POOL_TIMEOUT=30
-    # Replace command: ["api"] with this:
     command: >
       sh -c "
         while ! pg_isready -h db -p 5432 -U postgres;
@@ -65,7 +64,6 @@ services:
       - POOL_SIZE=20
       - MAX_OVERFLOW=30
       - POOL_TIMEOUT=30
-    # Replace command: ["scraper"] with this:
     command: >
       sh -c "
         while ! pg_isready -h db -p 5432 -U postgres;
