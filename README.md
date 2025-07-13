@@ -4,11 +4,19 @@
 - Clone this repo to your local
 - On your CMD go to the main repo where the docker-compose.yaml file is stored.
 - Run `docker compose up -d`
+- Wait until all containers start.
+- Call GET http://localhost:8000/hotels to see the outcome.
 
 # Why Docker
 
 - Docker is chosen as a deployment solution for this assignment to make sure all the environment variables are static across all operation system. The assignment can work on any computer as long as there is Docker installed on that computer.
-  
+
+# What do we have insider Docker
+
+- A PostgreSQL database container
+- A scraper container that only run once, you can restart it and it will scrape data then terminate.
+- An API server container
+
 # Assumption
 
 - The sources:
@@ -80,6 +88,10 @@
 
 - For each attribute, the one from the highest quality source will be selected, in case it is null or empty, the non empty one from the next in rank source will be selected.
 
+# The database:
+
+- PostgreSQL database running inside a docker container.
+
 # Database schema:
 ```
 +------------------------------+
@@ -130,7 +142,14 @@
   - The sensor is a lightweight task that will run first to check if there is data to process before spinning up the scrapers. We save resources by using this method.
   - Async scrapers to speed up scraping activity.
   - Each scraper is scalable depending on the amount of data.
+  - Data can be processed in chuncks, but usually for data comes from APIs, we can request API with pagination so chunking is not always necessary.
 
 # The API Server
 
 - One simple FastAPI server with one API only.
+
+# Testing plan
+
+- Unit tests that cover over 80% of the code.
+- Manually test the scraper.
+- Manually test the API call.
