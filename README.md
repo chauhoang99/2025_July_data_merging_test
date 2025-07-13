@@ -139,27 +139,28 @@
 - At the end of this workflow, there will be one mapping method that will combine all the cleaned data from the scrapers, do attribute value selection based on source ranking, then save the selected attributes to the right hotel.id in the `hotels` table. Every time there is a new batch of data coming in, this mapping method will check and update the hotels table with attributes, images and location from the highest ranking source available at that time.
 
   ```
-                    +----------------------+
-                    |  api_data_sensor     |
-                    +----------+-----------+
-                               |
-                               v
-              +-----------------------------+
-              |  trigger_scraper_decision   |
-              +-----------------------------+
-                               |
-                               v
-          +----------+    +-----------+    +-----------+
-          | scraper1 |    | scraper2  |    | scraper3  |
-          +----+-----+    +-----+-----+    +-----+-----+
-               \              |                /
-                \             |               /
-                 \            |              /
-                  \           |             /
-                   v          v            v
-                        +----------------+
-                        |    mapper      |
-                        +----------------+
+                        +----------------------+
+                        |        sensor        |
+                        +----------+-----------+
+                                   |
+                                   v
+                  +-----------------------------+
+                  |  trigger scraper decision   |
+                  +----------------+------------+
+                                   |
+                                   v
+        +------------------+   +--------------------+   +---------------------+
+        |   acme_scraper   |   |  patagonia_scraper |   | paperflies_scraper  |
+        +--------+---------+   +---------+----------+   +----------+----------+
+                 \                     |                         /
+                  \                    |                        /
+                   \                   |                       /
+                    \                  |                      /
+                     v                 v                     v
+                             +----------------+
+                             |     mapper     |
+                             +----------------+
+
 
 ```
 
