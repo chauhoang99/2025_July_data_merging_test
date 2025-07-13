@@ -21,7 +21,7 @@
 # Data cleaning
 
 - String sanitization.
-- Using Pydantic serializers to validate and transform field data.
+- Using Pydantic serializers to validate and transform the attributes.
 
 # Data Selection
 
